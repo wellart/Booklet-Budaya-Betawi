@@ -1,15 +1,107 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BookletPage } from './components/BookletPage';
-import { Printer, MapPin, Award } from 'lucide-react';
+import { Printer, MapPin, Award, Camera, X } from 'lucide-react';
 
 const App: React.FC = () => {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  
+  // State untuk Intro
+  const [showIntro, setShowIntro] = useState(true);
+  const [introFading, setIntroFading] = useState(false);
+  const [introStep, setIntroStep] = useState(0);
+
+  // Efek Animasi Intro
+  useEffect(() => {
+    // Sequence Timeline
+    const timeouts = [
+      setTimeout(() => setIntroStep(1), 500),  // Logo Masuk
+      setTimeout(() => setIntroStep(2), 1500), // Teks 1: Sejarah Betawi
+      setTimeout(() => setIntroStep(3), 2200), // Teks 2: Budaya Betawi
+      setTimeout(() => setIntroStep(4), 2900), // Teks 3: Hubungan Silat
+      setTimeout(() => setIntroStep(5), 3600), // Teks 4: Sejarah Sanggar
+      setTimeout(() => setIntroFading(true), 5500), // Mulai Fade Out
+      setTimeout(() => setShowIntro(false), 6200),  // Hapus Intro dari DOM
+    ];
+
+    return () => timeouts.forEach(clearTimeout);
+  }, []);
   
   const handlePrint = () => {
     window.print();
   };
 
   return (
-    <div className="min-h-screen bg-stone-100 font-['Lato'] py-8 print:py-0 print:bg-white">
+    <div className="min-h-screen bg-stone-100 font-['Lato'] py-8 print:py-0 print:bg-white relative">
+
+      {/* --- INTRO SPLASH SCREEN --- */}
+      {showIntro && (
+        <div className={`fixed inset-0 z-[200] bg-orange-50 flex flex-col justify-center items-center p-8 transition-opacity duration-700 ${introFading ? 'opacity-0' : 'opacity-100'}`}>
+          
+          {/* Logo Animation */}
+          <div className={`transform transition-all duration-1000 ease-out mb-8 ${introStep >= 1 ? 'scale-100 opacity-100 translate-y-0' : 'scale-90 opacity-0 translate-y-10'}`}>
+            <img 
+              src="logo_sanggar.png" 
+              alt="Logo Sanggar Rumah Baba" 
+              className="h-40 md:h-56 w-auto object-contain drop-shadow-xl"
+              onError={(e) => {
+                 // Fallback jika gambar tidak ada saat dev
+                 e.currentTarget.style.display = 'none';
+              }}
+            />
+             {/* Fallback Text if image fails or just as decoration */}
+             <h1 className="text-4xl md:text-5xl font-['Playfair_Display'] font-bold text-teal-900 mt-4 text-center">
+              Sanggar Rumah Baba
+            </h1>
+          </div>
+
+          {/* Text Sequence */}
+          <div className="space-y-4 text-center font-['Playfair_Display'] text-lg md:text-2xl text-slate-700 font-semibold">
+            
+            <div className={`transition-all duration-700 delay-0 ${introStep >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+              <span className="text-teal-700">❖</span> Sejarah Betawi
+            </div>
+
+            <div className={`transition-all duration-700 delay-0 ${introStep >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+              <span className="text-amber-600">❖</span> Budaya Betawi
+            </div>
+
+            <div className={`transition-all duration-700 delay-0 ${introStep >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+              <span className="text-red-700">❖</span> Hubungan Silat Dengan Betawi
+            </div>
+
+            <div className={`transition-all duration-700 delay-0 ${introStep >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+              <span className="text-green-700">❖</span> Sejarah Sanggar Rumah Baba
+            </div>
+
+          </div>
+
+          {/* Loading Bar Decoration */}
+          <div className="absolute bottom-10 w-48 h-1 bg-stone-200 rounded-full overflow-hidden">
+             <div className="h-full bg-teal-600 animate-[pulse_2s_infinite]"></div>
+          </div>
+        </div>
+      )}
+      
+      {/* Image Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex justify-center items-center p-4 print:hidden animate-in fade-in duration-200"
+          onClick={() => setSelectedImage(null)}
+        >
+          <button 
+            onClick={() => setSelectedImage(null)}
+            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors bg-white/10 p-2 rounded-full hover:bg-white/20"
+          >
+            <X size={32} />
+          </button>
+          <img 
+            src={selectedImage} 
+            alt="Full View" 
+            className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-in zoom-in-95 duration-300"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
       
       {/* Control Bar - Hidden when printing */}
       <div className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur shadow-md z-50 px-6 py-4 flex justify-between items-center no-print">
@@ -25,7 +117,7 @@ const App: React.FC = () => {
         </button>
       </div>
 
-      <div className="flex flex-col gap-8 print:gap-0 mt-16 print:mt-0">
+      <div className={`flex flex-col gap-8 print:gap-0 mt-16 print:mt-0 transition-opacity duration-1000 ${showIntro ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'}`}>
 
         {/* --- COVER PAGE --- */}
         <BookletPage className="justify-center items-center text-center" accentColor="fill-red-600">
@@ -73,41 +165,73 @@ const App: React.FC = () => {
         <BookletPage pageNumber={1} accentColor="fill-teal-600">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-2 h-10 bg-teal-600"></div>
-            <h2 className="text-3xl font-['Playfair_Display'] font-bold text-teal-800">Sejarah Betawi</h2>
+            <h2 className="text-3xl font-['Playfair_Display'] font-bold text-teal-800">Sejarah & Asal Usul Betawi</h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-6">
             <div className="md:col-span-2 text-justify text-slate-700 leading-relaxed space-y-4">
               <p>
-                <span className="font-bold text-teal-700 text-lg">Suku Betawi</span> merupakan etnis yang terbentuk dari percampuran berbagai bangsa dan suku yang pernah bermukim di Batavia sejak abad ke-17. Kehadiran masyarakat Betawi tidak bisa dilepaskan dari sejarah panjang kolonialisme, migrasi, dan perdagangan internasional di wilayah Batavia.
+                <span className="font-bold text-teal-700 text-lg">Melting Pot Batavia.</span> Etnis Betawi lahir dari proses akulturasi budaya yang panjang di kota pelabuhan Batavia. Sejak Gubernur Jenderal VOC <strong>Jan Pieterszoon Coen</strong> membangun Batavia pada tahun 1619, kota ini menjadi pusat perdagangan maritim yang menarik migran dari berbagai penjuru.
               </p>
               <p>
-                Asal-usul masyarakat Betawi berasal dari perpaduan suku Sunda, Jawa, Melayu, Bali, Bugis, Makassar, Ambon, Arab, Tionghoa, India, hingga Belanda. Pada masa VOC, Batavia menjadi kota pelabuhan besar yang menarik banyak pendatang. Para pendatang ini kemudian berinteraksi, berbaur, menikah, dan melahirkan sebuah identitas baru yang kini dikenal sebagai orang Betawi.
+                VOC mendatangkan tentara, pedagang, dan pekerja dari berbagai suku bangsa (Sunda, Jawa, Bali, Bugis, Ambon) serta bangsa asing (Tionghoa, Arab, India, dan Portugis/Mardijkers). Interaksi intensif di pemukiman yang padat, ditambah dengan pernikahan silang antar-etnis, perlahan meleburkan identitas kesukuan asli mereka menjadi identitas baru yang egalitarian: <strong>Orang Betawi</strong>.
+              </p>
+              <p>
+                Bahasa Melayu Pasar yang digunakan sebagai <em>lingua franca</em> dalam perdagangan di pelabuhan Sunda Kelapa berevolusi menjadi Bahasa Betawi, diperkaya dengan serapan kosakata dari bahasa Belanda, Portugis, Hokkien, dan Arab.
               </p>
             </div>
-            <div className="md:col-span-1">
+            
+            <div className="md:col-span-1 space-y-4">
               <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
                  <img 
                   src="https://picsum.photos/300/400?random=3" 
-                  alt="Batavia Lama" 
-                  className="w-full h-48 object-cover rounded mb-3 shadow-sm"
+                  alt="Batavia Era VOC" 
+                  className="w-full h-40 object-cover rounded mb-3 shadow-sm sepia"
                 />
                 <p className="text-xs text-orange-800 italic text-center">
-                  Ilustrasi suasana Batavia tempo dulu, tempat bertemunya berbagai etnis.
+                  Suasana kesibukan di pelabuhan Batavia tempo dulu.
                 </p>
+              </div>
+              
+              <div className="bg-teal-50 p-4 rounded-lg border border-teal-200">
+                <h4 className="font-bold text-teal-800 text-sm mb-2 border-b border-teal-200 pb-1">Faktor Pembentuk:</h4>
+                <ul className="text-xs text-teal-900 space-y-1 list-disc list-inside">
+                  <li>Perdagangan Rempah VOC</li>
+                  <li>Migrasi Antar-Pulau</li>
+                  <li>Pemukiman Budak & Pekerja</li>
+                  <li>Asimilasi Perkawinan</li>
+                </ul>
               </div>
             </div>
           </div>
 
-          <div className="bg-slate-50 p-6 rounded-xl border-l-4 border-teal-500 mb-6">
-            <h3 className="font-bold text-lg mb-2 text-teal-700">Identitas yang Kuat</h3>
-            <p className="text-slate-700 leading-relaxed text-sm">
-              Secara historis, istilah “Betawi” baru menguat pada abad ke-19 ketika kolonial Belanda mulai mencatat keberadaan penduduk lokal asli Batavia. Bahasa Betawi yang merupakan campuran Melayu, Sunda, dan pengaruh kosakata Portugis serta Tionghoa juga semakin menandai identitas mereka. Karakter khas mereka meliputi keramahan, solidaritas kampung, religiusitas, serta sikap tegas yang dikenal sebagai ciri “jagoan Betawi”.
+          {/* Section Jagoan */}
+          <div className="bg-slate-50 p-6 rounded-xl border-l-4 border-red-600 mb-6">
+            <h3 className="font-bold text-lg mb-3 text-slate-800 flex items-center gap-2">
+              <span className="text-red-600 text-2xl">⚔</span> Legenda Jagoan & Jawara Betawi
+            </h3>
+            <p className="text-slate-700 leading-relaxed text-sm mb-4">
+              Dalam struktur sosial Betawi yang seringkali tertindas oleh kebijakan kolonial, muncullah sosok <strong>Jawara</strong> atau Jagoan. Mereka bukan sekadar ahli silat, melainkan tokoh masyarakat yang menjadi pelindung kampung (*local hero*) dan simbol perlawanan terhadap ketidakadilan tuan tanah maupun pemerintah kolonial.
             </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+               <div className="bg-white p-3 rounded shadow-sm border border-slate-200">
+                  <strong className="text-red-700 block text-sm">Si Pitung</strong>
+                  <span className="text-xs text-slate-600">"Robin Hood" dari Rawa Belong, perampok ulung yang membagikan hasil jarahannya ke rakyat miskin.</span>
+               </div>
+               <div className="bg-white p-3 rounded shadow-sm border border-slate-200">
+                  <strong className="text-red-700 block text-sm">Entong Gendut</strong>
+                  <span className="text-xs text-slate-600">Pemimpin pemberontakan petani di Condet (1916) melawan kesewenang-wenangan tuan tanah.</span>
+               </div>
+               <div className="bg-white p-3 rounded shadow-sm border border-slate-200">
+                  <strong className="text-red-700 block text-sm">Haji Darip</strong>
+                  <span className="text-xs text-slate-600">Panglima perang dari Klender yang menggerakkan barisan rakyat pada masa revolusi fisik.</span>
+               </div>
+            </div>
           </div>
           
-          <p className="text-slate-700 leading-relaxed mt-auto border-t pt-4">
-             Hingga kini, masyarakat Betawi menjadi bagian penting dari identitas Jakarta, meski urbanisasi dan modernisasi membuat banyak budaya Betawi harus terus dilestarikan agar tidak punah.
+          <p className="text-slate-700 leading-relaxed mt-auto border-t pt-4 text-sm italic text-center">
+             "Lo jual, gue beli." — Falsafah yang menggambarkan keberanian dan sikap pantang menyerah masyarakat Betawi dalam mempertahankan harga diri.
           </p>
         </BookletPage>
 
@@ -118,57 +242,70 @@ const App: React.FC = () => {
             <h2 className="text-3xl font-['Playfair_Display'] font-bold text-amber-800">Kesenian Betawi</h2>
           </div>
 
-          <p className="mb-6 text-slate-700">
+          <p className="mb-4 text-slate-700 text-sm">
             Kesenian Betawi berkembang sebagai hasil perpaduan budaya yang kaya. Berikut adalah beberapa kesenian ikonik:
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Lenong */}
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-stone-100">
-              <h3 className="font-bold text-amber-700 mb-2 border-b pb-2">1. Lenong</h3>
-              <p className="text-sm text-slate-600 mb-2">
-                Seni teater tradisional dengan dialog spontan dan humor.
-              </p>
-              <ul className="text-xs list-disc list-inside text-slate-500 ml-2">
-                <li><strong>Lenong Denes</strong> (Bangsawan)</li>
-                <li><strong>Lenong Preman</strong> (Humoris/Bebas)</li>
-              </ul>
-            </div>
-
-             {/* Gambang Kromong */}
-             <div className="bg-white p-4 rounded-lg shadow-sm border border-stone-100">
-              <h3 className="font-bold text-amber-700 mb-2 border-b pb-2">2. Gambang Kromong</h3>
-              <p className="text-sm text-slate-600">
-                Perpaduan musik etnis Betawi dan Tionghoa. Instrumen khas berupa gambang, kromong, tehyan, dan alat musik gesek lainnya.
+          <div className="grid grid-cols-2 gap-5">
+            
+            {/* 1. Lenong */}
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-stone-100 flex flex-col">
+              <div className="h-28 w-full mb-3 overflow-hidden rounded bg-slate-100">
+                <img src="https://picsum.photos/400/250?random=20" alt="Pementasan Lenong" className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+              </div>
+              <h3 className="font-bold text-amber-700 mb-1 border-b border-amber-100 pb-1 text-sm">1. Lenong</h3>
+              <p className="text-xs text-slate-600 mb-1 flex-1">
+                Teater tradisional dengan dialog spontan & humor (Lenong Denes & Preman).
               </p>
             </div>
 
-            {/* Tanjidor & Ondel-ondel */}
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-stone-100 md:col-span-2 flex gap-4">
-              <div className="flex-1">
-                 <h3 className="font-bold text-amber-700 mb-2">3. Tanjidor</h3>
-                 <p className="text-sm text-slate-600">Musik orkes tiup peninggalan zaman kolonial Belanda.</p>
+             {/* 2. Gambang Kromong */}
+             <div className="bg-white p-3 rounded-lg shadow-sm border border-stone-100 flex flex-col">
+              <div className="h-28 w-full mb-3 overflow-hidden rounded bg-slate-100">
+                <img src="https://picsum.photos/400/250?random=21" alt="Gambang Kromong" className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
               </div>
-              <div className="w-px bg-slate-200"></div>
-              <div className="flex-1">
-                 <h3 className="font-bold text-amber-700 mb-2">4. Ondel-Ondel</h3>
-                 <p className="text-sm text-slate-600">Boneka raksasa ikon Betawi yang melambangkan penjaga kampung.</p>
-              </div>
+              <h3 className="font-bold text-amber-700 mb-1 border-b border-amber-100 pb-1 text-sm">2. Gambang Kromong</h3>
+              <p className="text-xs text-slate-600 flex-1">
+                Musik akulturasi Betawi-Tionghoa dengan instrumen gambang, kromong, & tehyan.
+              </p>
             </div>
 
-            {/* Tari & Kuliner */}
-             <div className="md:col-span-2 grid grid-cols-3 gap-4">
-                <div className="col-span-1">
-                  <img src="https://picsum.photos/200/300?random=4" alt="Tari Topeng" className="w-full h-full object-cover rounded-lg" />
+            {/* 3. Tanjidor */}
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-stone-100 flex flex-col">
+               <div className="h-28 w-full mb-3 overflow-hidden rounded bg-slate-100">
+                <img src="https://picsum.photos/400/250?random=22" alt="Tanjidor" className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+              </div>
+               <h3 className="font-bold text-amber-700 mb-1 border-b border-amber-100 pb-1 text-sm">3. Tanjidor</h3>
+               <p className="text-xs text-slate-600 flex-1">Orkes tiup (brass) peninggalan kolonial yang sering memeriahkan arak-arakan.</p>
+            </div>
+
+            {/* 4. Ondel-ondel */}
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-stone-100 flex flex-col">
+               <div className="h-28 w-full mb-3 overflow-hidden rounded bg-slate-100">
+                <img src="https://picsum.photos/400/250?random=23" alt="Ondel Ondel" className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+              </div>
+               <h3 className="font-bold text-amber-700 mb-1 border-b border-amber-100 pb-1 text-sm">4. Ondel-Ondel</h3>
+               <p className="text-xs text-slate-600 flex-1">Boneka raksasa simbol penjaga kampung & penolak bala.</p>
+            </div>
+
+            {/* 5. Tari Topeng */}
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-stone-100 flex flex-col">
+                <div className="h-28 w-full mb-3 overflow-hidden rounded bg-slate-100">
+                  <img src="https://picsum.photos/400/250?random=24" alt="Tari Topeng" className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
                 </div>
-                <div className="col-span-2 flex flex-col justify-center">
-                   <h3 className="font-bold text-amber-700 mb-1">5. Tari Topeng Betawi</h3>
-                   <p className="text-sm text-slate-600 mb-3">Mengandung nilai filosofi kehidupan dengan karakter topeng Panji, Jingga, dan Romo.</p>
-                   
-                   <h3 className="font-bold text-amber-700 mb-1">6. Seni Kuliner</h3>
-                   <p className="text-sm text-slate-600">Kerak telor, soto Betawi, asinan, semur jengkol, dodol, dan bir pletok.</p>
+               <h3 className="font-bold text-amber-700 mb-1 border-b border-amber-100 pb-1 text-sm">5. Tari Topeng</h3>
+               <p className="text-xs text-slate-600 flex-1">Tarian teatrikal dengan karakter topeng Panji, Jingga, dan Romo.</p>
+            </div>
+
+             {/* 6. Kuliner */}
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-stone-100 flex flex-col">
+                <div className="h-28 w-full mb-3 overflow-hidden rounded bg-slate-100">
+                  <img src="https://picsum.photos/400/250?random=25" alt="Kuliner Betawi" className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
                 </div>
-             </div>
+               <h3 className="font-bold text-amber-700 mb-1 border-b border-amber-100 pb-1 text-sm">6. Seni Kuliner</h3>
+               <p className="text-xs text-slate-600 flex-1">Kerak telor, soto Betawi, gabus pucung, dan bir pletok.</p>
+            </div>
+            
           </div>
         </BookletPage>
 
@@ -286,6 +423,86 @@ const App: React.FC = () => {
             <p className="text-center font-['Playfair_Display'] text-lg font-bold text-green-800 italic mt-6">
               "Pusat penguatan karakter, disiplin, dan gotong royong."
             </p>
+          </div>
+
+        </BookletPage>
+
+        {/* --- PAGE 5: GALERI KEGIATAN --- */}
+        <BookletPage pageNumber={5} accentColor="fill-orange-600">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-10 bg-orange-600"></div>
+              <h2 className="text-3xl font-['Playfair_Display'] font-bold text-orange-900">Galeri Kegiatan</h2>
+            </div>
+             <Camera className="text-orange-400 opacity-60" size={32} />
+          </div>
+
+          <p className="text-slate-700 mb-8 leading-relaxed">
+             Dokumentasi ini merekam jejak langkah, semangat latihan, serta kemeriahan pentas seni yang menjadi bukti nyata komitmen <span className="font-bold text-orange-800">Sanggar Rumah Baba</span> dalam merawat dan melestarikan budaya Betawi di tengah masyarakat modern.
+          </p>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 grid-rows-[160px_160px_160px]">
+            {/* Featured Photo - Large */}
+            <div 
+              className="col-span-2 row-span-2 relative group rounded-xl overflow-hidden shadow-md border-2 border-white cursor-pointer"
+              onClick={() => setSelectedImage("https://picsum.photos/600/600?random=10")}
+            >
+               <img 
+                 src="https://picsum.photos/600/600?random=10" 
+                 alt="Foto Bersama Anggota" 
+                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+               />
+               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
+                 <div>
+                    <p className="text-white font-bold text-shadow">Keluarga Besar Sanggar</p>
+                    <p className="text-white/80 text-xs mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                      <Camera size={12}/> Klik untuk memperbesar
+                    </p>
+                 </div>
+               </div>
+            </div>
+
+            {/* Side Photo 1 */}
+            <div 
+              className="relative group rounded-xl overflow-hidden shadow-sm border border-stone-200 cursor-pointer"
+              onClick={() => setSelectedImage("https://picsum.photos/300/300?random=11")}
+            >
+               <img src="https://picsum.photos/300/300?random=11" alt="Latihan Silat" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+               <div className="absolute inset-x-0 bottom-0 bg-white/90 py-1 px-2 text-xs font-semibold text-center text-orange-900 translate-y-full group-hover:translate-y-0 transition-transform">Latihan Rutin</div>
+            </div>
+
+            {/* Side Photo 2 */}
+            <div 
+              className="relative group rounded-xl overflow-hidden shadow-sm border border-stone-200 cursor-pointer"
+              onClick={() => setSelectedImage("https://picsum.photos/300/300?random=12")}
+            >
+               <img src="https://picsum.photos/300/300?random=12" alt="Pentas Seni" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+               <div className="absolute inset-x-0 bottom-0 bg-white/90 py-1 px-2 text-xs font-semibold text-center text-orange-900 translate-y-full group-hover:translate-y-0 transition-transform">Pentas Seni</div>
+            </div>
+
+            {/* Bottom Row - Wide */}
+            <div 
+              className="md:col-span-1 relative group rounded-xl overflow-hidden shadow-sm border border-stone-200 cursor-pointer"
+              onClick={() => setSelectedImage("https://picsum.photos/300/300?random=13")}
+            >
+               <img src="https://picsum.photos/300/300?random=13" alt="Festival Budaya" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+            </div>
+             <div 
+               className="md:col-span-2 relative group rounded-xl overflow-hidden shadow-sm border border-stone-200 cursor-pointer"
+               onClick={() => setSelectedImage("https://picsum.photos/600/300?random=14")}
+             >
+               <img src="https://picsum.photos/600/300?random=14" alt="Generasi Penerus" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+               <div className="absolute bottom-2 right-2 bg-orange-600 text-white text-xs px-3 py-1 rounded-full shadow">Generasi Penerus</div>
+            </div>
+          </div>
+
+          <div className="mt-auto bg-orange-50 border border-orange-200 p-4 rounded-lg flex items-center gap-4">
+             <div className="bg-white p-2 rounded-full shadow-sm">
+                <Camera size={24} className="text-orange-600" />
+             </div>
+             <div>
+               <p className="text-sm text-orange-900 font-bold italic">"Setiap gerakan adalah doa, setiap keringat adalah bukti cinta pada budaya."</p>
+             </div>
           </div>
 
         </BookletPage>
