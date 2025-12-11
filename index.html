@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Booklet Budaya Betawi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+      /* Custom Print Styles to ensure background colors and layouts are preserved in PDF */
+      @media print {
+        @page {
+          margin: 0;
+          size: A4;
+        }
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          background-color: white;
+        }
+        .no-print {
+          display: none !important;
+        }
+        .page-break {
+          break-after: page;
+          page-break-after: always;
+        }
+        .print-shadow-none {
+          box-shadow: none !important;
+        }
+        .print-full-width {
+          max-width: 100% !important;
+          width: 100% !important;
+          margin: 0 !important;
+        }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.1/",
+    "react": "https://esm.sh/react@^19.2.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.1/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.560.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-orange-50">
+    <div id="root"></div>
+  </body>
+</html>
