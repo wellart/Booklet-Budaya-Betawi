@@ -23,13 +23,14 @@ export const BookletPage: React.FC<BookletPageProps> = ({
       print-full-width
       flex flex-col
       page-break
+      print:min-h-0 print:h-[296mm] print:overflow-hidden /* Force A4 height in print to prevent spillover */
       ${className}
     `}>
       {/* Header Pattern */}
       <GigiBalang position="top" color={accentColor} />
 
       {/* Content Area */}
-      <div className="flex-1 px-12 py-8 flex flex-col relative z-10">
+      <div className="flex-1 px-12 py-8 flex flex-col relative z-10 print:py-6 print:px-10">
         {children}
       </div>
 

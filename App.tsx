@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BookletPage } from './components/BookletPage';
-import { Printer, MapPin, Award, Camera, X, ChevronLeft, ChevronRight, Music, Info, Youtube } from 'lucide-react';
+import { Printer, MapPin, Award, Camera, X, ChevronLeft, ChevronRight, Video, Info, Youtube, Instagram, Globe, PlayCircle, ExternalLink } from 'lucide-react';
 
 // Helper component untuk membungkus halaman dengan logika animasi Flipbook & print
 const PageWrapper: React.FC<{ 
@@ -28,8 +28,17 @@ const PageWrapper: React.FC<{
         [backface-visibility:hidden]
         bg-white
         
-        /* Print Styles: Reset absolute positioning and transforms */
-        print:relative print:transform-none print:visible print:opacity-100 print:block print:w-full print:h-auto
+        /* Print Styles: Force reset of all flipbook mechanics */
+        print:!transform-none 
+        print:!relative 
+        print:!visible 
+        print:!opacity-100 
+        print:!block 
+        print:w-full 
+        print:h-auto 
+        print:left-auto 
+        print:top-auto
+        print:[backface-visibility:visible]
       `}
       style={{ 
         zIndex: zIndex,
@@ -37,7 +46,7 @@ const PageWrapper: React.FC<{
       }}
     >
       {/* 1. Static Spine Shadow (Bayangan lipatan buku di kiri) */}
-      <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-stone-900/20 to-transparent z-20 pointer-events-none mix-blend-multiply" />
+      <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-stone-900/20 to-transparent z-20 pointer-events-none mix-blend-multiply print:hidden" />
 
       {/* 2. Dynamic Turning Shadow (Bayangan dinamis saat membalik) 
           Gradient ini menggelap saat halaman berputar menjauh (flipped)
@@ -48,6 +57,7 @@ const PageWrapper: React.FC<{
           bg-gradient-to-l from-black/40 via-black/10 to-transparent
           transition-opacity duration-1000 ease-in-out
           ${isFlipped ? 'opacity-100' : 'opacity-0'}
+          print:hidden
         `}
       />
 
@@ -57,6 +67,7 @@ const PageWrapper: React.FC<{
           absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white/30 to-transparent z-30 pointer-events-none
           transition-opacity duration-1000
           ${isFlipped ? 'opacity-0' : 'opacity-100'}
+          print:hidden
         `}
       />
       
@@ -73,49 +84,56 @@ const kesenianList = [
     title: "Lenong",
     shortDesc: "Teater tradisional dengan dialog spontan & humor.",
     longDesc: "Lenong adalah teater rakyat Betawi yang berkembang di akhir abad ke-19. Pertunjukan ini dibawakan dalam dialek Betawi dan diiringi musik Gambang Kromong. Ada dua jenis Lenong: Lenong Denes (cerita bangsawan dengan bahasa halus) dan Lenong Preman (cerita jagoan/rakyat dengan bahasa sehari-hari). Ciri khasnya adalah interaksi spontan dan humor cerdas antar pemain.",
-    image: "https://picsum.photos/400/250?random=20",
-    videoId: "ScMzIvxBSi4" // Placeholder ID: Wonderland Indonesia (Representative of culture)
+    image: "https://upload.wikimedia.org/wikipedia/commons/4/45/Lenong_at_Batavia_Festival_2012.jpg",
+    videoId: "VvBWiJkAjtg" // Placeholder ID: Wonderland Indonesia (Representative of culture)
   },
   {
     id: 2,
     title: "Gambang Kromong",
     shortDesc: "Musik akulturasi Betawi-Tionghoa.",
     longDesc: "Orkes Gambang Kromong merupakan bukti harmonisnya akulturasi budaya Betawi dan Tionghoa. Instrumennya terdiri dari gamelan (Gambang, Kromong, Gong) dan alat musik gesek Tionghoa (Tehyan, Kongahyan, Sukong). Irama musik ini sering mengiringi tari Cokek dan teater Lenong, dengan lagu-lagu klasik seperti 'Jali-jali' dan 'Kicir-kicir'.",
-    image: "https://picsum.photos/400/250?random=21",
-    videoId: "ScMzIvxBSi4" // Placeholder
+    image: "https://indonesiakaya.com/wp-content/uploads/2020/10/Gambang_Kromong_1200.jpg",
+    videoId: "QLslMaQEw34" // Placeholder
   },
   {
     id: 3,
     title: "Tanjidor",
     shortDesc: "Orkes tiup (brass) peninggalan kolonial.",
     longDesc: "Tanjidor adalah kesenian musik berbentuk orkes yang lahir pada abad ke-18. Namanya berasal dari bahasa Portugis 'Tanger' (memainkan alat musik). Dahulu dimainkan oleh budak-budak pemusik untuk menghibur tuan tanah. Kini, Tanjidor menjadi musik kemeriahan yang wajib ada saat arak-arakan pengantin atau pesta rakyat.",
-    image: "https://picsum.photos/400/250?random=22",
-    videoId: "ScMzIvxBSi4" // Placeholder
+    image: "https://upload.wikimedia.org/wikipedia/commons/6/6c/Tanjidor%2C_by_M_Jeffry_Hanafiah.jpg",
+    videoId: "lDEqo_E5P1w" // Placeholder
   },
   {
     id: 4,
     title: "Ondel-Ondel",
     shortDesc: "Boneka raksasa simbol penjaga kampung.",
     longDesc: "Dahulu disebut 'Barongan', Ondel-ondel dipercaya leluhur sebagai penolak bala atau penjaga kampung dari roh jahat. Wajah merah (laki-laki) menyimbolkan keberanian dan ketegasan, sedangkan wajah putih (perempuan) menyimbolkan kebaikan dan kesucian. Kini Ondel-ondel menjadi ikon semarak pesta Jakarta.",
-    image: "https://picsum.photos/400/250?random=23",
-    videoId: "ScMzIvxBSi4" // Placeholder
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Ondel_Ondel_Khas_Betawi_-_panoramio.jpg/1200px-Ondel_Ondel_Khas_Betawi_-_panoramio.jpg",
+    videoId: "_y8vV7Accjw" // Placeholder
   },
   {
     id: 5,
     title: "Tari Topeng",
     shortDesc: "Tarian teatrikal dengan karakter topeng.",
     longDesc: "Tari Topeng Betawi bukan sekadar tarian, melainkan perpaduan seni tari, musik, dan teater. Penari mengganti topeng sesuai karakter cerita. Terdapat tiga watak utama topeng: Panji (putih, halus/lembut), Samba (merah muda, lincah/genit), dan Jingga/Klana (merah, gagah/kasar).",
-    image: "https://picsum.photos/400/250?random=24",
-    videoId: "ScMzIvxBSi4" // Placeholder
+    image: "https://www.senibudayabetawi.com/wp-content/uploads/2022/11/Tari-topeng-betawi-foto-travelinkmagz.com_.jpg",
+    videoId: "BbX60C0E0P4" // Placeholder
   },
   {
     id: 6,
-    title: "Seni Kuliner",
-    shortDesc: "Kerak telor, soto Betawi, dan bir pletok.",
-    longDesc: "Kuliner Betawi kaya akan rempah dan pengaruh budaya Arab, Tionghoa, serta Eropa. Kerak Telor adalah primadona jajanan kerak nasi dengan telur bebek/ayam. Bir Pletok adalah minuman penghangat non-alkohol dari jahe, serai, dan kayu secang, diciptakan masyarakat Betawi untuk menandingi kebiasaan minum wine orang Belanda.",
-    image: "https://picsum.photos/400/250?random=25",
-    videoId: "ScMzIvxBSi4" // Placeholder
+    title: "Palang Pintu",
+    shortDesc: "Tradisi adu pantun dan silat dalam pernikahan Betawi.",
+    longDesc: "Palang Pintu adalah tradisi unik dalam pernikahan adat Betawi yang menggabungkan seni bela diri (silat) dan sastra lisan (pantun). Sebelum pengantin pria diperbolehkan masuk menemui pengantin wanita, rombongan pria harus melewati tantangan dari jawara pihak wanita. Prosesi ini diisi dengan berbalas pantun jenaka dan atraksi silat, yang menyimbolkan ujian kesungguhan mempelai pria dalam melindungi dan membahagiakan keluarganya kelak.",
+    image: "https://sanggarrumahbaba.com/public/storage/optionbuilder/uploads/969809-22-2025_0616pmWhatsApp%20Image%202022-09-30%20at%2023.41.46.jpeg",
+    videoId: "YbhgiKXQdWw" // Placeholder
   }
+];
+
+const videoGalleryList = [
+    { id: 'v1', title: "Profil Sanggar Rumah Baba", videoId: "YbhgiKXQdWw", desc: "Mengenal lebih dekat kegiatan dan sejarah sanggar." },
+    { id: 'v2', title: "Atraksi Palang Pintu", videoId: "lDEqo_E5P1w", desc: "Seni bela diri silat berpadu pantun jenaka." },
+    { id: 'v3', title: "Pentas Seni Budaya", videoId: "BbX60C0E0P4", desc: "Penampilan murid sanggar di festival budaya." },
+    { id: 'v4', title: "Latihan Silat Anak", videoId: "_y8vV7Accjw", desc: "Generasi penerus melestarikan warisan leluhur." },
 ];
 
 const App: React.FC = () => {
@@ -125,7 +143,7 @@ const App: React.FC = () => {
   const [selectedKesenian, setSelectedKesenian] = useState<typeof kesenianList[0] | null>(null);
 
   const [currentPage, setCurrentPage] = useState(0);
-  const totalPages = 6; // Cover (0) + 5 Pages
+  const totalPages = 7; // Cover (0) + 6 Pages (History, Arts, Silat, Profile, Photo Gallery, Video Gallery)
   
   // State untuk Intro
   const [showIntro, setShowIntro] = useState(true);
@@ -167,7 +185,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-100 font-['Lato'] py-8 print:py-0 print:bg-white relative pb-24 print:pb-0 overflow-x-hidden">
+    <div className="min-h-screen bg-stone-100 font-['Lato'] py-8 print:py-0 print:bg-white relative pb-24 print:pb-0 overflow-x-hidden print:overflow-visible">
 
       {/* --- INTRO SPLASH SCREEN --- */}
       {showIntro && (
@@ -363,7 +381,7 @@ const App: React.FC = () => {
 
         {/* --- COVER PAGE (Index 0) --- */}
         <PageWrapper index={0} currentIndex={currentPage} totalPages={totalPages}>
-          <BookletPage className="justify-center items-center text-center" accentColor="fill-red-600">
+          <BookletPage className="text-center" accentColor="fill-red-600">
             <div className="flex-1 flex flex-col justify-center items-center border-4 border-double border-red-100 p-8 m-4 rounded-xl">
               
               <div className="mb-8">
@@ -390,12 +408,12 @@ const App: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4 w-full max-w-2xl mt-8">
                  <img 
-                  src="https://picsum.photos/400/300?random=1" 
+                  src="https://srb.wella.cloud/booklet/img/1.png" 
                   alt="Ondel Ondel" 
                   className="w-full h-48 object-cover rounded-lg shadow-md grayscale hover:grayscale-0 transition-all duration-500"
                 />
                 <img 
-                  src="https://picsum.photos/400/300?random=2" 
+                  src="https://srb.wella.cloud/booklet/img/2.png" 
                   alt="Silat Betawi" 
                   className="w-full h-48 object-cover rounded-lg shadow-md grayscale hover:grayscale-0 transition-all duration-500"
                 />
@@ -428,7 +446,7 @@ const App: React.FC = () => {
               <div className="md:col-span-1 space-y-4">
                 <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
                    <img 
-                    src="https://picsum.photos/300/400?random=3" 
+                    src="https://upload.wikimedia.org/wikipedia/commons/7/7f/COLLECTIE_TROPENMUSEUM_Luchtfoto_van_het_spoorwegstation_te_Batavia-Kota_TMnr_10014030.jpg" 
                     alt="Batavia Era VOC" 
                     className="w-full h-40 object-cover rounded mb-3 shadow-sm sepia"
                   />
@@ -507,7 +525,7 @@ const App: React.FC = () => {
                     />
                     <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
                        <div className="bg-white/80 rounded-full p-2">
-                         <Music size={20} className="text-amber-700" />
+                         <Video size={20} className="text-amber-700" />
                        </div>
                     </div>
                   </div>
@@ -534,7 +552,7 @@ const App: React.FC = () => {
 
             <div className="relative mb-8">
               <img 
-                src="https://picsum.photos/800/300?random=5" 
+                src="https://srb.wella.cloud/booklet/img/3.png" 
                 alt="Silat Practice" 
                 className="w-full h-48 object-cover rounded-xl shadow-md opacity-90"
               />
@@ -597,7 +615,7 @@ const App: React.FC = () => {
               />
             </div>
 
-            <div className="flex flex-col md:flex-row gap-6 items-start mb-8">
+            <div className="flex flex-col md:flex-row gap-6 items-start mb-6">
               <div className="flex-1 text-slate-700 text-justify space-y-4">
                 <p>
                   <strong>Sanggar Rumah Baba</strong> didirikan pada <span className="text-green-700 font-bold">10 November 2010</span> di Pondok Cabe Ilir oleh <strong>Bang Udin Cecek</strong>. Sanggar ini lahir dari kepedulian untuk melestarikan budaya Betawi yang mulai tergerus oleh perkembangan zaman.
@@ -633,15 +651,63 @@ const App: React.FC = () => {
               </ul>
             </div>
 
-            <div className="border-t pt-4">
+            <div className="border-t pt-4 pb-2">
               <h4 className="font-bold text-slate-800 mb-2">Jejak Langkah & Prestasi</h4>
               <p className="text-sm text-slate-600 mb-4">
                 Selama lebih dari satu dekade, Sanggar Rumah Baba aktif dalam festival budaya lokal hingga nasional, pertunjukan pemerintahan, dan pembinaan atlet silat berprestasi.
               </p>
-              <p className="text-center font-['Playfair_Display'] text-lg font-bold text-green-800 italic mt-6">
-                "Pusat penguatan karakter, disiplin, dan gotong royong."
-              </p>
             </div>
+
+            {/* CONTACT & SOCIAL MEDIA SECTION */}
+            <div className="mt-2 bg-slate-50 border border-green-100 rounded-xl p-5 shadow-inner">
+               <h4 className="font-['Playfair_Display'] font-bold text-lg text-green-900 mb-4 flex items-center gap-2 border-b border-green-200 pb-2">
+                 Informasi & Kontak
+               </h4>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 {/* Alamat */}
+                 <div className="flex items-start gap-3">
+                    <div className="bg-white p-2 rounded-full text-green-700 shadow-sm border border-green-50">
+                      <MapPin size={20} />
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-slate-800 text-sm">Sekretariat Sanggar</h5>
+                      <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                        Jl. Cabe IV, Pondok Cabe Ilir,<br/>
+                        Kec. Pamulang, Tangerang Selatan,<br/>
+                        Banten 15418
+                      </p>
+                    </div>
+                 </div>
+
+                 {/* Social Media */}
+                 <div className="flex items-start gap-3">
+                    <div className="bg-white p-2 rounded-full text-green-700 shadow-sm border border-green-50">
+                      <Globe size={20} />
+                    </div>
+                    <div className="w-full">
+                      <h5 className="font-bold text-slate-800 text-sm">Media Sosial & Web</h5>
+                      <ul className="mt-2 space-y-2">
+                        <li className="flex items-center gap-2 text-xs text-slate-600 hover:text-green-700 transition-colors cursor-pointer group">
+                           <Instagram size={14} className="text-pink-600 group-hover:scale-110 transition-transform"/> 
+                           <span className="font-semibold">@sanggar_rumahbaba</span>
+                        </li>
+                        <li className="flex items-center gap-2 text-xs text-slate-600 hover:text-green-700 transition-colors cursor-pointer group">
+                           <Youtube size={14} className="text-red-600 group-hover:scale-110 transition-transform"/> 
+                           <span className="font-semibold">Sanggar Rumah Baba TV</span>
+                        </li>
+                        <li className="flex items-center gap-2 text-xs text-slate-600 hover:text-green-700 transition-colors cursor-pointer group">
+                           <Globe size={14} className="text-blue-600 group-hover:scale-110 transition-transform"/> 
+                           <span className="font-semibold">www.rumahbaba.or.id</span>
+                        </li>
+                      </ul>
+                    </div>
+                 </div>
+               </div>
+            </div>
+
+            <p className="text-center font-['Playfair_Display'] text-lg font-bold text-green-800 italic mt-6">
+                "Pusat penguatan karakter, disiplin, dan gotong royong."
+            </p>
 
           </BookletPage>
         </PageWrapper>
@@ -711,7 +777,6 @@ const App: React.FC = () => {
                  className="md:col-span-2 relative group rounded-xl overflow-hidden shadow-sm border border-stone-200 cursor-pointer"
                  onClick={() => setSelectedImage("https://picsum.photos/600/300?random=14")}
                >
-                 <img src="https://picsum.photos/600/300?random=14" alt="Generasi Penerus" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                  <div className="absolute bottom-2 right-2 bg-orange-600 text-white text-xs px-3 py-1 rounded-full shadow">Generasi Penerus</div>
               </div>
             </div>
@@ -725,6 +790,61 @@ const App: React.FC = () => {
                </div>
             </div>
 
+          </BookletPage>
+        </PageWrapper>
+
+        {/* --- PAGE 6: GALERI VIDEO (Index 6) --- */}
+        <PageWrapper index={6} currentIndex={currentPage} totalPages={totalPages}>
+          <BookletPage pageNumber={6} accentColor="fill-red-600">
+             <div className="flex items-center justify-between mb-6">
+               <div className="flex items-center gap-3">
+                 <div className="w-2 h-10 bg-red-600"></div>
+                 <h2 className="text-3xl font-['Playfair_Display'] font-bold text-red-900">Galeri Video</h2>
+               </div>
+               <Youtube className="text-red-500 opacity-60" size={32} />
+             </div>
+
+             <div className="bg-red-50 border border-red-100 rounded-xl p-6 mb-8 text-center shadow-sm">
+                <Youtube size={48} className="mx-auto text-red-600 mb-2" />
+                <h3 className="font-bold text-xl text-red-900 mb-1">Channel Youtube Resmi</h3>
+                <p className="text-slate-600 text-sm mb-4">
+                  Saksikan dokumentasi lengkap, latihan rutin, dan pentas seni Sanggar Rumah Baba di channel resmi kami.
+                </p>
+                <a 
+                  href="https://www.youtube.com/@sanggarrumahbaba" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-2 rounded-full font-bold hover:bg-red-700 transition-colors shadow-md"
+                >
+                   <PlayCircle size={18} /> Kunjungi Channel
+                   <ExternalLink size={14} />
+                </a>
+                <p className="text-xs text-slate-400 mt-2">@sanggarrumahbaba</p>
+             </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               {videoGalleryList.map((video) => (
+                 <div key={video.id} className="bg-white rounded-lg shadow-sm border border-slate-100 overflow-hidden group hover:shadow-md transition-shadow">
+                    <div className="aspect-video w-full bg-black relative">
+                       <iframe 
+                          src={`https://www.youtube.com/embed/${video.videoId}`} 
+                          title={video.title}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                       />
+                    </div>
+                    <div className="p-3">
+                       <h4 className="font-bold text-slate-800 text-sm mb-1 truncate">{video.title}</h4>
+                       <p className="text-xs text-slate-500">{video.desc}</p>
+                    </div>
+                 </div>
+               ))}
+             </div>
+
+             <p className="mt-auto text-center text-slate-500 text-xs italic">
+               *Pastikan perangkat terhubung ke internet untuk memutar video.
+             </p>
           </BookletPage>
         </PageWrapper>
 
